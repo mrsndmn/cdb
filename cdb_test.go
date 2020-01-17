@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"sync"
 	"testing"
+
+	"golang.org/x/exp/mmap"
 )
 
 func TestShouldReturnAllValues(t *testing.T) {
@@ -258,6 +260,35 @@ func BenchmarkReaderGet(b *testing.B) {
 
 	writer.Close()
 	b.StartTimer()
+
+	reader, _ := handle.GetReader(f)
+
+	for j := 0; j < b.N; j++ {
+		reader.Get(keys[j%n])
+	}
+}
+
+func BenchmarkReaderGetMMaped(b *testing.B) {
+	b.StopTimer()
+
+	n := 1000
+	file, _ := os.Create("test.cdb")
+	defer os.Remove("test.cdb")
+
+	handle := New()
+	writer, _ := handle.GetWriter(file)
+
+	keys := make([][]byte, n)
+	for i := 0; i < n; i++ {
+		keys[i] = []byte(strconv.Itoa(i))
+		writer.Put(keys[i], keys[i])
+	}
+
+	writer.Close()
+	b.StartTimer()
+	file.Close()
+	f, _ := mmap.Open("test.cdb")
+	defer f.Close()
 
 	reader, _ := handle.GetReader(f)
 
