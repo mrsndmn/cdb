@@ -285,10 +285,11 @@ func BenchmarkReaderGetMMaped(b *testing.B) {
 	}
 
 	writer.Close()
-	b.StartTimer()
 	file.Close()
 	f, _ := mmap.Open("test.cdb")
 	defer f.Close()
+
+	b.StartTimer()
 
 	reader, _ := handle.GetReader(f)
 
