@@ -1,4 +1,4 @@
-module github.com/alldroll/cdb/v2
+module github.com/mrsndmn/cdb/v2
 
 go 1.12
 
